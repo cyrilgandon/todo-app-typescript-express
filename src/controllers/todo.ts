@@ -1,11 +1,9 @@
 import { Request, Response } from 'express';
 import { TodoService } from '../app';
-import { Todo } from '../models/todo';
-import { asNumber } from '../util/parsing';
+import { nextId } from '../models/entity';
+import { Todo, validate } from '../models/todo';
+import { asNumber, isBoolean } from '../util/parsing';
 
-function makeId() {
-    return Math.floor((Math.random() * 100000) + 1);
-}
 /**
  * GET /api/todos
  * Get all todos.
@@ -20,30 +18,39 @@ export function getTodos(req: Request, res: Response) {
  * Get todo with todoId.
  */
 export function getTodo(req: Request, res: Response) {
-    const todos = TodoService.load();
-
     const todoId = asNumber(req.params.todoId);
-    if (todoId !== undefined) {
-        const todo = todos.filter((todo) => todo.id === todoId)[0];
-        if (todo) {
-            res.json(todo);
-        } else {
-            res.status(404).send(`Cannot find todo with id ${todoId}`);
-        }
-    } else {
-        res.status(412).send(`id ${todoId} is not a number`);
+    if (todoId === undefined) {
+        res.status(400).send('Given ID is not a number');
+        return;
     }
+
+    const todos = TodoService.load();
+    const todo = todos.find((todo) => todo.id === todoId);
+    if (!todo) {
+        res.status(404).send('No todo exist with given ID');
+        return;
+    }
+
+    res.json(todo);
 }
 
 /**
  * Create a new Todo
  */
-export function postTodos(req: Request, res: Response) {
+export function postTodo(req: Request, res: Response) {
+    const { error } = validate(req.body);
+    if (error) {
+        res.status(400).send(error.details[0].message);
+        return;
+    }
+
     const todos = TodoService.load();
-    const todo = {
-        creationDate: Date.now(),
+    const now = Date.now();
+    const todo: Todo = {
+        creationDate: now,
         done: false,
-        id: makeId(),
+        id: nextId(todos),
+        lastUpdated: now,
         what: req.body.what,
     };
     todos.push(todo);
@@ -55,41 +62,53 @@ export function postTodos(req: Request, res: Response) {
 /**
  * Update an existing Todo
  */
-export function postTodo(req: Request, res: Response) {
-    const todos = TodoService.load();
-
+export function putTodo(req: Request, res: Response) {
     const todoId = asNumber(req.params.todoId);
-    if (todoId !== undefined) {
-        const todo = todos.filter((todo) => todo.id === todoId)[0];
-        if (todo) {
-
-            todo.done = req.body.done;
-            todo.what = req.body.what;
-
-            TodoService.save(todos);
-
-            res.json(todo);
-        } else {
-            res.status(404).send(`Cannot find todo with id ${todoId}`);
-        }
-    } else {
-        res.status(412).send(`id ${todoId} is not a number`);
+    if (todoId === undefined) {
+        res.status(400).send('Given ID is not a number');
+        return;
     }
+
+    const todos = TodoService.load();
+    const todo = todos.find((todo) => todo.id === todoId);
+    if (!todo) {
+        res.status(404).send('No todo exist with given ID');
+        return;
+    }
+
+    const { error } = validate(req.body);
+    if (error) {
+        res.status(400).send(error.details[0].message);
+        return;
+    }
+    const now = Date.now();
+
+    todo.lastUpdated = now;
+
+    const done = req.body.done;
+    if (isBoolean(done)) {
+        todo.done = done;
+    }
+    todo.what = req.body.what;
+    TodoService.save(todos);
+
+    res.json(todo);
 }
 
 /**
- * Delete an existing Todo
+ * Delete a Todo
  */
 export function deleteTodo(req: Request, res: Response) {
+    const todoId = asNumber(req.params.todoId);
+    if (todoId === undefined) {
+        res.status(400).send('Given ID is not a number');
+        return;
+    }
+
     const todos = TodoService.load();
 
-    const todoId = asNumber(req.params.todoId);
-    if (todoId !== undefined) {
-        const newTodos = todos.filter((todo) => todo.id !== todoId);
-        TodoService.save(newTodos);
-        res.status(200);
-        res.json({});
-    } else {
-        res.status(412).send(`id ${todoId} is not a number`);
-    }
+    const newTodos = todos.filter((todo) => todo.id !== todoId);
+    TodoService.save(newTodos);
+
+    res.json({});
 }
