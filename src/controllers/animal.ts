@@ -7,8 +7,8 @@ import { Animal, validate } from '../models/animal';
  * Get all animals.
  */
 export function getAnimals(req: Request, res: Response) {
-    const todos = AnimalService.load();
-    res.json(todos);
+    const animals = AnimalService.load();
+    res.json(animals);
 }
 
 /**
@@ -16,14 +16,14 @@ export function getAnimals(req: Request, res: Response) {
  * Get an animal with its REFID key.
  */
 export function getAnimal(req: Request, res: Response) {
-    const todos = AnimalService.load();
-    const todo = todos.find((animal) => animal.rfidKey === req.params.rfidKey);
-    if (!todo) {
-        res.status(404).send('No todo exist with given ID');
+    const animals = AnimalService.load();
+    const animal = animals.find((animal) => animal.rfidKey === req.params.rfidKey);
+    if (!animal) {
+        res.status(404).send('No animal exist with given RFID Key');
         return;
     }
 
-    res.json(todo);
+    res.json(animal);
 }
 
 /**

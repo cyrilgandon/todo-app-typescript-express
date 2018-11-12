@@ -12,8 +12,10 @@ dotenv.config({ path: '.env.example' });
 // Controllers (route handlers)
 import * as animalController from './controllers/animal';
 
+import { Animal } from './models/animal';
 import AnimalLocalStorage from './persistence/animalLocalStorage';
-import AnimalService from './persistence/animalService';
+import AnimalService from './persistence/repoService';
+import RepoService from './persistence/repoService';
 
 // Create Express server
 const app = express();
@@ -37,6 +39,6 @@ app.post('/api/animals', animalController.postAnimal);
 app.get('/api/animals/:rfidKey', animalController.getAnimal);
 
 // Initialize localStorage service
-export const AnimalService: AnimalService = new AnimalLocalStorage();
+export const AnimalService: RepoService<Animal> = new AnimalLocalStorage();
 
 export default app;

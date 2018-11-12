@@ -1,4 +1,4 @@
-# Todo app
+# Animal app
 
 Boilerplate code from [TypeScript-Node-Starter](https://github.com/Microsoft/TypeScript-Node-Starter).
 

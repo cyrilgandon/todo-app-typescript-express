@@ -1,8 +1,8 @@
 import { LocalStorage } from 'node-localstorage';
 import { Animal } from '../models/animal';
-import AnimalService from './animalService';
+import RepoService from './repoService';
 
-export default class AnimalLocalStorage implements AnimalService {
+export default class AnimalLocalStorage implements RepoService<Animal> {
 
     private readonly key = 'animalsApp-animals';
 
@@ -10,8 +10,8 @@ export default class AnimalLocalStorage implements AnimalService {
     constructor() {
         this.localStorage = new LocalStorage('./localStorage-Animals');
     }
-    public save(animals: Animal[]) {
-        const asString = JSON.stringify(animals);
+    public save(data: Animal[]) {
+        const asString = JSON.stringify(data);
 
         this.localStorage.setItem(this.key, asString);
     }
@@ -20,8 +20,8 @@ export default class AnimalLocalStorage implements AnimalService {
         const asString = this.localStorage.getItem(this.key);
 
         if (asString) {
-            const todos = JSON.parse(asString);
-            return todos;
+            const data = JSON.parse(asString);
+            return data;
         } else {
             return [];
         }

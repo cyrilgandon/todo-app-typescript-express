@@ -26,7 +26,7 @@ describe('POST /animals', () => {
       .post('/api/animals')
       .send({
         species: 'cat',
-        height: 50,
+        withersHeight: 50,
         weight: 100,
         description: 'a pretty cat',
       })
@@ -37,8 +37,6 @@ describe('POST /animals', () => {
     return request(app)
       .post('/api/animals')
       .send({
-        height: 50,
-        weight: 100,
         description: 'a pretty cat',
       })
       .expect(400);
