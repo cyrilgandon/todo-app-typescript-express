@@ -10,11 +10,10 @@ import path from 'path';
 dotenv.config({ path: '.env.example' });
 
 // Controllers (route handlers)
-import * as apiController from './controllers/api';
-import * as todoController from './controllers/todo';
+import * as animalController from './controllers/animal';
 
-import TodoLocalStorage from './persistence/todoLocalStorage';
-import TodoService from './persistence/todoService';
+import AnimalLocalStorage from './persistence/animalLocalStorage';
+import AnimalService from './persistence/animalService';
 
 // Create Express server
 const app = express();
@@ -31,17 +30,13 @@ app.use(lusca.xframe('SAMEORIGIN'));
 app.use(lusca.xssProtection(true));
 
 /**
- * Primary app routes.
+ * Animal routes.
  */
-app.get('/api', apiController.index);
-app.get('/api/todos', todoController.getTodos);
-app.post('/api/todos', todoController.postTodo);
-
-app.get('/api/todos/:todoId', todoController.getTodo);
-app.put('/api/todos/:todoId', todoController.putTodo);
-app.delete('/api/todos/:todoId', todoController.deleteTodo);
+app.get('/api/animals', animalController.getAnimals);
+app.post('/api/animals', animalController.postAnimal);
+app.get('/api/animals/:rfidKey', animalController.getAnimal);
 
 // Initialize localStorage service
-export const TodoService: TodoService = new TodoLocalStorage();
+export const AnimalService: AnimalService = new AnimalLocalStorage();
 
 export default app;
