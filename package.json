@@ -1,7 +1,7 @@
 {
-  "name": "todo-app-typescript-express",
+  "name": "animal-app-typescript-express",
   "version": "0.1.0",
-  "description": "A todo-app backend with TypeScript and Express",
+  "description": "A animal-app backend with TypeScript and Express",
   "repository": {
     "type": "git",
     "url": "https://github.com/cyrilgandon/todo-app-typescript-express"
